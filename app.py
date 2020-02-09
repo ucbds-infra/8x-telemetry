@@ -11,7 +11,6 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.escape
 import tornado.options
-from grade_assignment import grade_assignment
 import logging
 import traceback
 import pandas as pd
