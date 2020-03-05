@@ -43,7 +43,7 @@ ERROR_PATH = "tornadoerrors"
 
 def write_info(grade_info, db_fname="telemetry.db"):
     sql_cmd = """
-    INSERT INTO telemetry(question, answer, results, assignment_path, timestamp)
+    INSERT INTO telemetry(user, question, answer, results, assignment, section, timestamp)
     VALUES (?,?,?,?,?)
     """
 
@@ -171,7 +171,8 @@ class GoferHandler(HubAuthenticated, tornado.web.RequestHandler):
         question = req_data["question"]
         answer = req_data["answer"]
         results = req_data["results"]
-        assignment_path = req_data["assignment_path"]
+        assignment = req_data["assignment"]
+        section=req_data["section"]
 
 
         timestamp = str(time.time())
@@ -183,8 +184,8 @@ class GoferHandler(HubAuthenticated, tornado.web.RequestHandler):
         # Let user know their submission was received
         self.write("User submission has been received. Grade will be posted to the gradebook once it's finished running!")
         self.finish()
-
-        write_info((question, answer, results, assignment_path, timestamp))
+        # TODO : hash of user id 
+        write_info((user, question, answer, results, assignment, section, timestamp))
 
         # try:
         #     # Grade assignment
