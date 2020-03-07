@@ -167,6 +167,7 @@ class GoferHandler(HubAuthenticated, tornado.web.RequestHandler):
     async def post(self):
         """Accept notebook submissions, saves, then grades them"""
         user = self.get_current_user()
+        print(self.request.body.decode("utf-8"))
         req_data = tornado.escape.json_decode(self.request.body)
         # # in the future, assignment should be metadata in notebook
         # notebook = req_data['nb']
@@ -253,7 +254,7 @@ class GoferHandler(HubAuthenticated, tornado.web.RequestHandler):
 
 if __name__ == '__main__':
     create_table_sql = """ CREATE TABLE IF NOT EXISTS telemetry (
-        user text NOT NULL,
+        user text,
         question text NOT NULL,
         answer text NOT NULL,
         results text NOT NULL,
@@ -264,7 +265,7 @@ if __name__ == '__main__':
     create_table("telemetry.db", create_table_sql)
 
     tornado.options.parse_command_line()
-    app = tornado.web.Application([(prefix, GoferHandler)])
+    app = tornado.web.Application([(r"/", GoferHandler)])
 
     # logger = logging.getLogger('tornado.application')
     # logger.addHandler(csvHandler(ERROR_FILE))
