@@ -41,14 +41,27 @@ ERROR_PATH = "tornadoerrors"
 #     finally:
 #         conn.close()
 
-def write_info(grade_info, db_fname="telemetry.db"):
+def create_table(db_file, create_table_sql):
+    """ create a table from the create_table_sql statement
+    :param conn: Connection object
+    :param create_table_sql: a CREATE TABLE statement
+    :return: conn: connection to db
+    """
+    global conn
+    try:
+        conn = sqlite3.connect(db_file)
+        c = conn.cursor()
+        c.execute(create_table_sql)
+        print(sqlite3.version)
+    except Error as e:
+        print(e)
+
+def write_info(grade_info, conn):
     sql_cmd = """
     INSERT INTO telemetry(user, question, answer, results, assignment, section, timestamp)
-    VALUES (?,?,?,?,?)
+    VALUES (?,?,?,?,?,?,?)
     """
-
     try:
-        conn = sqlite3.connect(db_fname)
         # context manager here takes care of conn.commit()
         with conn:
             conn.execute(sql_cmd, grade_info)
@@ -174,7 +187,6 @@ class GoferHandler(HubAuthenticated, tornado.web.RequestHandler):
         assignment = req_data["assignment"]
         section=req_data["section"]
 
-
         timestamp = str(time.time())
         # # save notebook submission with user id and time stamp
         # submission_file = "/home/vipasu/gofer_service/submissions/{}_{}_{}_{}.ipynb".format(user['name'], section, assignment, timestamp)
@@ -184,8 +196,8 @@ class GoferHandler(HubAuthenticated, tornado.web.RequestHandler):
         # Let user know their submission was received
         self.write("User submission has been received. Grade will be posted to the gradebook once it's finished running!")
         self.finish()
-        # TODO : hash of user id 
-        write_info((user, question, answer, results, assignment, section, timestamp))
+        # TODO : hash of user id
+        write_info((user, question, answer, results, assignment, section, timestamp), conn)
 
         # try:
         #     # Grade assignment
@@ -240,12 +252,24 @@ class GoferHandler(HubAuthenticated, tornado.web.RequestHandler):
 
 
 if __name__ == '__main__':
+    create_table_sql = """ CREATE TABLE IF NOT EXISTS telemetry (
+        user text NOT NULL,
+        question text NOT NULL,
+        answer text NOT NULL,
+        results text NOT NULL,
+        assignment text NOT NULL,
+        section text NOT NULL,
+        timestamp text NOT NULL
+    ); """
+    create_table("telemetry.db", create_table_sql)
+
     tornado.options.parse_command_line()
     app = tornado.web.Application([(prefix, GoferHandler)])
 
     # logger = logging.getLogger('tornado.application')
     # logger.addHandler(csvHandler(ERROR_FILE))
-
-    app.listen(10101)
+    port = 10101
+    app.listen(port)
+    print("listening on port {}".format(port))
 
     tornado.ioloop.IOLoop.current().start()
