@@ -65,12 +65,13 @@ def write_info(grade_info, conn):
         # context manager here takes care of conn.commit()
         with conn:
             conn.execute(sql_cmd, grade_info)
+            conn.commit()
     except Error as e:
         print(e)
         print("Error inserting into database for the following record")
         print(grade_info)
-    finally:
-        conn.close()
+#     finally:
+
 
 
 # class GradePostException(Exception):
@@ -183,8 +184,8 @@ class GoferHandler(HubAuthenticated, tornado.web.RequestHandler):
         #     course = "8x"
 
         question = req_data["question"]
-        answer = req_data["answer"]
-        results = req_data["results"]
+        answer = str(req_data["answer"])
+        results = str(req_data["results"])
         assignment = req_data["assignment"]
         section=req_data["section"]
 
