@@ -188,7 +188,7 @@ class GoferHandler(HubAuthenticated, tornado.web.RequestHandler):
         assignment = req_data["assignment"]
         section=req_data["section"]
 
-        timestamp = str(time.time())
+        timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(time.time()))
         # # save notebook submission with user id and time stamp
         # submission_file = "/home/vipasu/gofer_service/submissions/{}_{}_{}_{}.ipynb".format(user['name'], section, assignment, timestamp)
         # with open(submission_file, 'w') as outfile:
