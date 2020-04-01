@@ -5,3 +5,4 @@ pandas
 jupyterhub
 lxml
 oauthlib
+gunicorn
