@@ -148,6 +148,7 @@ def write_info(grade_info, db_fname="telemetry.db"):
 class GoferHandler(HubAuthenticated, tornado.web.RequestHandler):
 
     async def get(self):
+        print("Received request")
         self.write("This is a post only page. You probably shouldn't be here!")
         self.finish()
 
@@ -246,5 +247,6 @@ if __name__ == '__main__':
     # logger.addHandler(csvHandler(ERROR_FILE))
 
     app.listen(10101)
+    print("Listening on port 10101")
 
     tornado.ioloop.IOLoop.current().start()
