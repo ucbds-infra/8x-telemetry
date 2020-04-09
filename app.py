@@ -67,6 +67,7 @@ class GoferHandler(HubAuthenticated, tornado.web.RequestHandler):
     async def post(self):
         """Accept notebook submissions, saves, then grades them"""
         user = self.get_current_user()
+        print("Received submission from %s" % user)
         print(self.request.body.decode("utf-8"))
         req_data = tornado.escape.json_decode(self.request.body)
 
