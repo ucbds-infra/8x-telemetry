@@ -42,8 +42,8 @@ def create_table(db_file, create_table_sql):
 
 def write_info(grade_info, conn):
     sql_cmd = """
-    INSERT INTO telemetry(user, question, answer, results, assignment, section, timestamp)
-    VALUES (?,?,?,?,?,?,?)
+    INSERT INTO telemetry(user, question, answer, results, correct, assignment, section, timestamp)
+    VALUES (?,?,?,?,?,?,?,?)
     """
     try:
         # context manager here takes care of conn.commit()
@@ -74,6 +74,7 @@ class GoferHandler(HubAuthenticated, tornado.web.RequestHandler):
         question = req_data["question"]
         answer = str(req_data["answer"])
         results = str(req_data["results"])
+        correct = bool(req_data["correct"])
         assignment = req_data["assignment"]
         section=req_data["section"]
 
@@ -83,7 +84,7 @@ class GoferHandler(HubAuthenticated, tornado.web.RequestHandler):
         self.write("User submission has been received. Grade will be posted to the gradebook once it's finished running!")
         self.finish()
         # TODO : hash of user id
-        write_info((user, question, answer, results, assignment, section, timestamp), conn)
+        write_info((user, question, answer, results, correct, assignment, section, timestamp), conn)
 
 
 
@@ -93,11 +94,12 @@ if __name__ == '__main__':
         question text NOT NULL,
         answer text NOT NULL,
         results text NOT NULL,
+        correct boolean NOT NULL,
         assignment text NOT NULL,
         section text NOT NULL,
         timestamp text NOT NULL
     ); """
-    create_table("telemetry.db", create_table_sql)
+    create_table("/share/telemetry.db", create_table_sql)
 
     tornado.options.parse_command_line()
     app = tornado.web.Application([(r"/", GoferHandler)])
