@@ -1,3 +1,6 @@
+# Source: Claudio Fahey
+# Link: https://stackoverflow.com/questions/5884066/hashing-a-dictionary 
+
 import hashlib
 import base64
 
