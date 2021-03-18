@@ -1,13 +1,24 @@
-import copy
+import hashlib
+import base64
 
-def hash_dict(d):
-    """ Recursively hash a dictionary and its contents
+def hash_sha256(d):
+    """Deterministically hashes input using SHA-256
     :d: Python dictionary or dict-like data structure
-    :return:
+    :return: hash value
     """
-    if not isinstance(d, dict):
-        raise TypeError('Non dictionary-like data structure not supported')
-    new_d = copy.deepcopy(d)
-    for k, v in new_d.items():
-        new_d[k] = hash_dict(v)
-    return hash(tuple(frozenset(sorted(new_d.items()))))
+    hasher = hashlib.sha256()
+    hasher.update(repr(make_hashable(d)).encode())
+    return base64.b64encode(hasher.digest()).decode()
+
+def make_hashable(d):
+    """ Recursively hash an object (and its contents)
+    :d: Python dictionary or dict-like data structure
+    :return: hashable data structure (tuple)
+    """
+    if isinstance(d, (tuple, list)):
+        return tuple((make_hashable(e) for e in d))
+    if isinstance(d, dict):
+        return tuple(sorted((k, make_hashable(v)) for k,v in d.items()))
+    if isinstance(d, (set, frozenset)):
+        return tuple(sorted(make_hashable(e) for e in d))
+    return d
