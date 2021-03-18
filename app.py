@@ -20,7 +20,7 @@ from jupyterhub.services.auth import HubAuthenticated
 from lxml import etree
 from oauthlib.oauth1.rfc5849 import signature, parameters
 from sqlite3 import Error
-from hash_dict import hash_dict
+from hash_dict import hash_sha256
 
 prefix = os.environ.get('JUPYTERHUB_SERVICE_PREFIX', '/')
 ERROR_FILE = "tornado_errors.csv"
@@ -69,9 +69,9 @@ class GoferHandler(HubAuthenticated, tornado.web.RequestHandler):
         """Accept notebook submissions, saves, then grades them"""
         user_model = self.get_current_user()
         if user_model:
-            user_id = hash_dict(user_model)
+            user_id = hash_sha256(user_model)
         else:
-            user_id = 'nan'   # if something goes wrong, we can detect errors 
+            user_id = 'nan'   # if something goes wrong, we can detect errors
         print("Received submission from %s" % user)
         print(self.request.body.decode("utf-8"))
         req_data = tornado.escape.json_decode(self.request.body)
